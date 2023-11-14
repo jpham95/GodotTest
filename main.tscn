@@ -1,0 +1,168 @@
+[gd_scene load_steps=16 format=3 uid="uid://jw6osflba60b"]
+
+[ext_resource type="Texture2D" uid="uid://dv52v6vgn5xx3" path="res://assets/hdris/kloofendal_48d_partly_cloudy_puresky_2k.hdr" id="1_sk7ny"]
+[ext_resource type="Texture2D" uid="uid://dxy2qimexrbnq" path="res://assets/textures/dev/grids/Dark/texture_07.png" id="2_fx2xl"]
+[ext_resource type="Script" path="res://ClimbingWall.gd" id="3_sp6rb"]
+[ext_resource type="Script" path="res://Player.gd" id="3_t5caq"]
+[ext_resource type="PackedScene" path="res://assets/models/THECUTESTLEMONEVER.glb" id="5_uqm1t"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_drsb1"]
+panorama = ExtResource("1_sk7ny")
+
+[sub_resource type="Sky" id="Sky_81gew"]
+sky_material = SubResource("PanoramaSkyMaterial_drsb1")
+
+[sub_resource type="Environment" id="Environment_2rski"]
+background_mode = 2
+sky = SubResource("Sky_81gew")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hc0ip"]
+albedo_texture = ExtResource("2_fx2xl")
+uv1_triplanar = true
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_l2ww4"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_let4l"]
+height = 1.2
+
+[sub_resource type="Animation" id="Animation_knues"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_qrk5f"]
+resource_name = "jump"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.5, 0, 0), Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(-0.0349066, 0, 0.0174533), Vector3(0.0174533, 0, 0), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4160j"]
+_data = {
+"RESET": SubResource("Animation_knues"),
+"jump": SubResource("Animation_qrk5f")
+}
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_i1d38"]
+
+[node name="World" type="Node3D"]
+
+[node name="Env" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Env"]
+environment = SubResource("Environment_2rski")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Env"]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Stage" type="Node3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Stage"]
+use_collision = true
+collision_layer = 2
+size = Vector3(50, 1, 50)
+material = SubResource("StandardMaterial3D_hc0ip")
+
+[node name="ClimbingWall" type="CSGBox3D" parent="Stage"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 0.2, 25, 24, 0)
+use_collision = true
+collision_layer = 6
+size = Vector3(50, 1, 50)
+material = SubResource("StandardMaterial3D_hc0ip")
+script = ExtResource("3_sp6rb")
+metadata/isClimbable = true
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+collision_mask = 6
+script = ExtResource("3_t5caq")
+
+[node name="stand_collider" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_l2ww4")
+
+[node name="crouch_collider" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(0.998098, 0, 0, 0, 0.998098, 0, 0, 0, 0.998098, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_let4l")
+disabled = true
+
+[node name="Neck" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+
+[node name="Head" type="Node3D" parent="Player/Neck"]
+
+[node name="Eyes" type="Node3D" parent="Player/Neck/Head"]
+
+[node name="Camera3D" type="Camera3D" parent="Player/Neck/Head/Eyes"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/Neck/Head/Eyes"]
+libraries = {
+"": SubResource("AnimationLibrary_4160j")
+}
+
+[node name="RayCastLookAt" type="RayCast3D" parent="Player/Neck/Head/Eyes"]
+target_position = Vector3(0, 0, -2)
+collision_mask = 7
+debug_shape_custom_color = Color(1, 0, 0, 1)
+
+[node name="RayCastUncrouch" type="RayCast3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+target_position = Vector3(0, 2, 0)
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+collision_layer = 2
+collision_mask = 3
+linear_velocity = Vector3(1, 1, 1)
+angular_velocity = Vector3(0.0174533, 0.0174533, 0.0174533)
+
+[node name="THECUTESTLEMONEVER" parent="RigidBody3D" instance=ExtResource("5_uqm1t")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.754, -1.42669, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 5.754, 2.101, -0.469086)
+shape = SubResource("SphereShape3D_i1d38")
