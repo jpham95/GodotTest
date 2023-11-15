@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dxy2qimexrbnq" path="res://assets/textures/dev/grids/Dark/texture_07.png" id="2_fx2xl"]
 [ext_resource type="Script" path="res://ClimbingWall.gd" id="3_sp6rb"]
 [ext_resource type="Script" path="res://Player.gd" id="3_t5caq"]
-[ext_resource type="PackedScene" path="res://assets/models/THECUTESTLEMONEVER.glb" id="5_uqm1t"]
+[ext_resource type="PackedScene" uid="uid://b00sjgs755sce" path="res://assets/models/THECUTESTLEMONEVER.glb" id="5_uqm1t"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_drsb1"]
 panorama = ExtResource("1_sk7ny")

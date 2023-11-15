@@ -39,6 +39,7 @@ var lerp_speed = 8.0
 
 var direction = Vector3.ZERO
 
+var air_jump = true
 # SLIDE
 var slide_timer = 0.0
 var slide_vector = Vector2.ZERO
@@ -100,7 +101,6 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("sprint"):
 		walking = false
 		sprinting = true
-		crouching = false
 	elif Input.is_action_just_released("sprint"):
 		walking = true
 		sprinting = false
@@ -124,6 +124,7 @@ func _physics_process(delta):
 		
 		if Input.is_action_just_pressed("jump") || Input.is_action_just_pressed("interact"):
 			climbing = false
+			air_jump = true
 	else:
 		# Add the gravity.
 		if not is_on_floor():
@@ -133,7 +134,8 @@ func _physics_process(delta):
 				position.x = 0.0
 				position.y = 0.0
 				position.z = 0.0
-		
+		elif not air_jump:
+			air_jump = true
 		# Handle interact
 		if Input.is_action_pressed("interact"):
 			if ray_cast_look_at.is_colliding():
@@ -190,6 +192,11 @@ func _physics_process(delta):
 			if slide_timer <= 0:
 				sliding = false
 				freelooking = false
+				stand_collider.disabled = true
+				crouch_collider.disabled = false
+				head.position.y = lerp(head.position.y, 0.0, delta*lerp_speed)
+		else:
+			slide_timer = 0.0
 		
 		# Handle bobbing
 		if sprinting:
@@ -243,7 +250,7 @@ func _physics_process(delta):
 
 func playerInteract(object):
 	print(object.get_class())
-	if object is ClimbingWall:
+	if object is Climbable:
 		climbing = true
 	else:
 		pass
@@ -254,8 +261,9 @@ func playerJump():
 			sliding = false
 		animation_player.play("jump")
 		velocity.y += JUMP_VELOCITY
-	else:
+	elif air_jump:
 		# double jump with lower strength
+		air_jump = false
 		velocity.y = JUMP_VELOCITY/2
 
 func playerCrouch(delta, input_dir):
